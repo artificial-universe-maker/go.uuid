@@ -309,26 +309,34 @@ func (u *NullUUID) UnmarshalBinary(data []byte) (err error) {
 	return
 }
 
-func (u *NullUUID) UnmarshalText(text []byte) (err error) {
+func (u *NullUUID) UnmarshalText(text []byte) error {
 	u.Valid = true
-	err = u.UUID.UnmarshalText(text)
+	err := u.UUID.UnmarshalText(text)
 	if err != nil {
-		u.Valid = false
+		(*u).UUID = Nil
+		(*u).Valid = false
 	}
-	return
+	return nil
 }
 
 func (u *UUID) UnmarshalJSON(text []byte) (err error) {
-	return u.UnmarshalText(text[1 : len(text)-1])
+	if len(text) < 32 {
+		return fmt.Errorf("uuid: UUID string too short: %s", text)
+	}
+	// Remove quotation marks
+	bytes := text[1 : len(text)-1]
+
+	return u.UnmarshalText(bytes)
 }
 
-func (u *NullUUID) UnmarshalJSON(text []byte) (err error) {
+func (u *NullUUID) UnmarshalJSON(text []byte) error {
 	u.Valid = true
-	err = u.UUID.UnmarshalJSON(text)
+	err := u.UUID.UnmarshalJSON(text)
 	if err != nil {
-		u.Valid = false
+		(*u).UUID = Nil
+		(*u).Valid = false
 	}
-	return
+	return nil
 }
 
 // Value implements the driver.Valuer interface.
