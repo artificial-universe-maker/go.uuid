@@ -300,6 +300,37 @@ func (u *UUID) UnmarshalBinary(data []byte) (err error) {
 	return
 }
 
+func (u *NullUUID) UnmarshalBinary(data []byte) (err error) {
+	u.Valid = true
+	err = u.UUID.UnmarshalBinary(data)
+	if err != nil {
+		u.Valid = false
+	}
+	return
+}
+
+func (u *NullUUID) UnmarshalText(text []byte) (err error) {
+	u.Valid = true
+	err = u.UUID.UnmarshalText(text)
+	if err != nil {
+		u.Valid = false
+	}
+	return
+}
+
+func (u *UUID) UnmarshalJSON(text []byte) (err error) {
+	return u.UnmarshalText(text[1 : len(text)-1])
+}
+
+func (u *NullUUID) UnmarshalJSON(text []byte) (err error) {
+	u.Valid = true
+	err = u.UUID.UnmarshalJSON(text)
+	if err != nil {
+		u.Valid = false
+	}
+	return
+}
+
 // Value implements the driver.Valuer interface.
 func (u UUID) Value() (driver.Value, error) {
 	return u.String(), nil
