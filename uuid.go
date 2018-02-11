@@ -320,6 +320,9 @@ func (u *NullUUID) UnmarshalText(text []byte) error {
 }
 
 func (u *UUID) UnmarshalJSON(text []byte) (err error) {
+	if string(text) == "null" {
+		return
+	}
 	if len(text) < 32 {
 		return fmt.Errorf("uuid: UUID string too short: %s", text)
 	}
