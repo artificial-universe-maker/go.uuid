@@ -313,15 +313,15 @@ func (u *NullUUID) UnmarshalText(text []byte) error {
 	u.Valid = true
 	err := u.UUID.UnmarshalText(text)
 	if err != nil {
-		(*u).UUID = Nil
-		(*u).Valid = false
+		u.UUID = Nil
+		u.Valid = false
 	}
 	return nil
 }
 
 func (u *UUID) UnmarshalJSON(text []byte) (err error) {
 	if string(text) == "null" {
-		return
+		return fmt.Errorf("uuid: null uuid provided")
 	}
 	if len(text) < 32 {
 		return fmt.Errorf("uuid: UUID string too short: %s", text)
@@ -334,10 +334,11 @@ func (u *UUID) UnmarshalJSON(text []byte) (err error) {
 
 func (u *NullUUID) UnmarshalJSON(text []byte) error {
 	u.Valid = true
+	fmt.Println("Unmarshal here", string(text))
 	err := u.UUID.UnmarshalJSON(text)
 	if err != nil {
-		(*u).UUID = Nil
-		(*u).Valid = false
+		u.UUID = Nil
+		u.Valid = false
 	}
 	return nil
 }
